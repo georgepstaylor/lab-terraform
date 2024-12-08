@@ -50,11 +50,10 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
       identifiers = ["lambda.amazonaws.com"]
     }
   }
-
-
+}
 
 resource "aws_iam_role" "ses_send_lambda_role" {
-  name = "ses_send_lambda_role"
+  name               = "ses_send_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 }
 
