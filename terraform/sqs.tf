@@ -14,22 +14,22 @@ resource "aws_sqs_queue" "email_queue" {
 #   enabled          = true
 # }
 
-# data "aws_iam_policy_document" "email_queue_policy" {
-#   statement {
-#     effect = "Allow"
-#     principals {
-#       type        = "AWS"
-#       identifiers = ["*"]
-#     }
-#     actions   = ["sqs:SendMessage"]
-#     resources = [aws_sqs_queue.email_queue.arn]
-#     condition {
-#       test     = "ArnEquals"
-#       variable = "aws:SourceArn"
-#       values   = [aws_lambda_function.email_sender.arn]
-#     }
-#   }
-# }
+data "aws_iam_policy_document" "email_queue_policy" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    actions   = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.email_queue.arn]
+    # condition {
+    #   test     = "ArnEquals"
+    #   variable = "aws:SourceArn"
+    #   values   = [aws_lambda_function.email_sender.arn]
+    # }
+  }
+}
 
 resource "aws_sqs_queue_policy" "email_queue_policy" {
   queue_url = aws_sqs_queue.email_queue.id
