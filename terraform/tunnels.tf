@@ -179,8 +179,8 @@ resource "cloudflare_record" "george_dev_coolify" {
   zone_id = data.cloudflare_zone.george_dev.id
 }
 
-resource "cloudflare_record" "george_dev_shhmas_stage" {
-  name    = "shhmas-stage"
+resource "cloudflare_record" "george_dev_shhmas_staging" {
+  name    = "shhmas-staging"
   proxied = true
   ttl     = 1
   type    = "CNAME"
