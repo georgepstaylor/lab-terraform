@@ -82,7 +82,7 @@ data "onepassword_vault" "lab" {
 }
 
 resource "onepassword_item" "AWS_ACCESS_KEY_SQS" {
-  vault    = data.onepassword_vault.lab.id
+  vault    = data.onepassword_vault.lab.uuid
   category = "login"
   username = aws_iam_access_key.shhmas.id
   password = aws_iam_access_key.shhmas.secret
