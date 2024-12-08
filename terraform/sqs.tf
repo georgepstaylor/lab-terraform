@@ -98,7 +98,7 @@ resource "aws_sqs_queue_policy" "email_queue_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_sqs" {
-  role       = aws_iam_role.lambda_role.name
+  role       = aws_iam_role.ses_send_lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
