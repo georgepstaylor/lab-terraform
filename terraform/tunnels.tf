@@ -109,7 +109,7 @@ resource "cloudflare_tunnel_config" "lab" {
 
     ingress_rule {
       service  = "http://10.10.82.149"
-      hostname = "*.shhmas.george.dev"
+      hostname = "shhmas-staging.george.dev"
     }
 
     ingress_rule {
