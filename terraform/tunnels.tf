@@ -87,13 +87,13 @@ resource "cloudflare_tunnel_config" "lab" {
         no_happy_eyeballs        = false
         no_tls_verify            = false
         proxy_port               = 0
-#        access {
-#          aud_tag = [
-#            "b9d7639b037a6921810c5fe8de245bf425bb68cf40124a610d55ba163ded95d9",
-#          ]
-#          required  = true
-#          team_name = "georgetaylor"
-#        }
+        #        access {
+        #          aud_tag = [
+        #            "b9d7639b037a6921810c5fe8de245bf425bb68cf40124a610d55ba163ded95d9",
+        #          ]
+        #          required  = true
+        #          team_name = "georgetaylor"
+        #        }
       }
     }
 
@@ -179,8 +179,8 @@ resource "cloudflare_record" "george_dev_coolify" {
   zone_id = data.cloudflare_zone.george_dev.id
 }
 
-resource "cloudflare_record" "george_dev_shhmas_wildcard" {
-  name    = "*.shhmas"
+resource "cloudflare_record" "george_dev_shhmas_stage" {
+  name    = "shhmas-stage"
   proxied = true
   ttl     = 1
   type    = "CNAME"
