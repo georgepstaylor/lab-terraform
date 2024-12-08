@@ -4,7 +4,7 @@ resource "aws_sqs_queue" "email_queue" {
   max_message_size           = 262144
   message_retention_seconds  = 900
   receive_wait_time_seconds  = 20
-  visibility_timeout_seconds = 3
+  visibility_timeout_seconds = 30
 
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.email_queue_dead_letter.arn,
