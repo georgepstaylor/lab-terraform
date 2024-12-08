@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    onepassword = {
+      source  = "1Password/onepassword"
+      version = "2.1.2"
+    }
   }
   required_version = "~> 1.7"
 
@@ -37,4 +41,8 @@ provider "cloudflare" {
 
 provider "aws" {
   region = "eu-west-2"
+}
+
+provider "onepassword" {
+  # OP_SERVICE_ACCOUNT_TOKEN is set in the environment var `OP_SERVICE_ACCOUNT_TOKEN`
 }
