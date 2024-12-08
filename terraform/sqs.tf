@@ -7,12 +7,61 @@ resource "aws_sqs_queue" "email_queue" {
   visibility_timeout_seconds = 30
 }
 
-# resource "aws_lambda_event_source_mapping" "sqs_lambda_trigger" {
-#   event_source_arn = aws_sqs_queue.email_queue.arn
-#   function_name    = aws_lambda_function.email_sender.arn
-#   batch_size       = 1
-#   enabled          = true
-# }
+data "archive_file" "ses_send" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda/ses_send"
+  output_path = "${path.module}/lambda/ses_send/ses_send.zip"
+  excludes    = ["ses_send.zip"]
+}
+
+resource "aws_lambda_function" "email_sender" {
+  filename         = "${path.module}/lambda/ses_send/ses_send.zip"
+  function_name    = "ses_send"
+  architectures    = ["arm64"]
+  role             = aws_iam_role.lambda_role.arn
+  runtime          = "python3.12"
+  handler          = "ses_send.handler"
+  source_code_hash = data.archive_file.ses_send.output_base64sha256
+
+  timeout = 10
+
+  lifecycle {
+    replace_triggered_by = [aws_iam_role.ses_send_lambda_role]
+  }
+}
+
+data "aws_iam_policy_document" "lambda_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ses:SendEmail",
+      "ses:SendRawEmail"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "ses_send_lambda_role" {
+  name = "ses_send_lambda_role"
+}
+
+resource "aws_iam_policy" "lambda_policy" {
+  name        = "ses_send_lambda_policy"
+  description = "Allows Lambda to send emails via SES"
+  policy      = data.aws_iam_policy_document.lambda_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_policy" {
+  role       = aws_iam_role.ses_send_lambda_role.name
+  policy_arn = aws_iam_policy.lambda_policy.arn
+}
+
+resource "aws_lambda_event_source_mapping" "sqs_lambda_trigger" {
+  event_source_arn = aws_sqs_queue.email_queue.arn
+  function_name    = aws_lambda_function.email_sender.arn
+  batch_size       = 1
+  enabled          = true
+}
 
 data "aws_iam_policy_document" "email_queue_policy" {
   statement {
@@ -23,11 +72,11 @@ data "aws_iam_policy_document" "email_queue_policy" {
     }
     actions   = ["sqs:SendMessage"]
     resources = [aws_sqs_queue.email_queue.arn]
-    # condition {
-    #   test     = "ArnEquals"
-    #   variable = "aws:SourceArn"
-    #   values   = [aws_lambda_function.email_sender.arn]
-    # }
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_lambda_function.email_sender.arn]
+    }
   }
 }
 
@@ -36,10 +85,10 @@ resource "aws_sqs_queue_policy" "email_queue_policy" {
   policy    = data.aws_iam_policy_document.email_queue_policy.json
 }
 
-# resource "aws_iam_role_policy_attachment" "lambda_sqs" {
-#   role       = aws_iam_role.lambda_role.name
-#   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
-# }
+resource "aws_iam_role_policy_attachment" "lambda_sqs" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
 
 #####################
 # SQS IAM User
