@@ -18,7 +18,7 @@ resource "aws_lambda_function" "email_sender" {
   filename         = "${path.module}/lambda/ses_send/ses_send.zip"
   function_name    = "ses_send"
   architectures    = ["arm64"]
-  role             = aws_iam_role.lambda_role.arn
+  role             = aws_iam_role.ses_send_lambda_role.arn
   runtime          = "python3.12"
   handler          = "ses_send.handler"
   source_code_hash = data.archive_file.ses_send.output_base64sha256
