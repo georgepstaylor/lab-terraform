@@ -85,3 +85,27 @@ resource "aws_ssm_parameter" "george_dev_ses_smtp_user" {
     ses_smtp_password = aws_iam_access_key.george_dev_ses_smtp_user.ses_smtp_password_v4
   })
 }
+
+
+########################
+# SES CloudWatch Alarms
+########################
+
+resource "aws_sns_topic" "ses_george_dev" {
+  name = "ses-george-dev"
+}
+resource "aws_cloudwatch_metric_alarm" "ses_george_dev_send_hourly" {
+  alarm_name          = "ses-george-dev-send-hourly"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "Send"
+  namespace           = "AWS/SES"
+  period              = 3600
+  statistic           = "Sum"
+  threshold           = 100
+  alarm_description   = "Alarm when the number of emails sent in the last hour exceeds 100"
+  alarm_actions       = [aws_sns_topic.shhmas_alerts.arn]
+  ok_actions = [aws_sns_topic.shhmas_alerts.arn]
+}
+
+
